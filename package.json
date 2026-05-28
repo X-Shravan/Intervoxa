@@ -1,0 +1,17 @@
+{
+  "name": "intervoxa-ai-mock-interview-landing",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Task 1 landing page for an AI mock interview internship project.",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check src/app.js"
+  },
+  "keywords": [
+    "ai-interview",
+    "landing-page",
+    "internship-project"
+  ],
+  "author": "",
+  "license": "MIT"
+}
