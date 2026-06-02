@@ -1,0 +1,17 @@
+{
+  "name": "intervoxa-ai-mock-interview-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Responsive AI mock interview platform UI with contact validation and preparation tracker.",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js && node --check js/navigation.js && node --check js/validation.js && node --check js/taskManager.js"
+  },
+  "keywords": [
+    "ai-interview",
+    "landing-page",
+    "internship-project"
+  ],
+  "author": "",
+  "license": "MIT"
+}

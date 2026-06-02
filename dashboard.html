@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Intervoxa interview preparation tracker with dynamic DOM task management." />
+    <title>Preparation Tracker | Intervoxa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+
+    <header class="site-header" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Intervoxa home">
+        <span class="brand-mark">AI</span>
+        <span>Intervoxa</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNavigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-links" id="primaryNavigation" aria-label="Page navigation">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html" aria-current="page">Preparation Tracker</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <p class="eyebrow">Dynamic Dashboard</p>
+        <h1>Interview Preparation Tracker</h1>
+        <p>
+          Add, complete, and delete preparation tasks while monitoring your total, completed, and pending progress in real time.
+        </p>
+      </section>
+
+      <section class="dashboard-grid" aria-label="Progress counters">
+        <article class="dashboard-card">
+          <span>Total Tasks</span>
+          <strong id="totalTasks">0</strong>
+        </article>
+        <article class="dashboard-card completed-card">
+          <span>Completed</span>
+          <strong id="completedTasks">0</strong>
+        </article>
+        <article class="dashboard-card pending-card">
+          <span>Pending</span>
+          <strong id="pendingTasks">0</strong>
+        </article>
+      </section>
+
+      <section class="task-manager-card" aria-label="Interview task manager">
+        <div class="task-manager-header">
+          <div>
+            <p class="eyebrow">Preparation Tasks</p>
+            <h2>Plan your next practice session</h2>
+          </div>
+          <span class="status-pill" id="progressLabel">0% complete</span>
+        </div>
+
+        <form class="task-form" id="taskForm">
+          <label class="sr-only" for="taskInput">Add preparation task</label>
+          <input id="taskInput" type="text" placeholder="Example: Practice Java Interview" autocomplete="off" />
+          <button class="primary-button" type="submit">Add Task</button>
+        </form>
+
+        <div class="progress-track" aria-hidden="true">
+          <span id="progressBar"></span>
+        </div>
+
+        <ul class="task-list" id="taskList" aria-live="polite"></ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2026 Intervoxa. Built as an AI Mock Interview internship project.</p>
+      <div>
+        <a href="index.html">Home</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </footer>
+
+    <script src="js/navigation.js" defer></script>
+    <script src="js/taskManager.js" defer></script>
+  </body>
+</html>
