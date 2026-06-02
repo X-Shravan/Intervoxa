@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Contact the Intervoxa AI Mock Interview Platform team with validated form handling." />
+    <title>Contact Us | Intervoxa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+
+    <header class="site-header" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Intervoxa home">
+        <span class="brand-mark">AI</span>
+        <span>Intervoxa</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNavigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-links" id="primaryNavigation" aria-label="Page navigation">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Preparation Tracker</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero narrow-hero">
+        <p class="eyebrow">Contact Management</p>
+        <h1>Contact Us</h1>
+        <p>
+          Have a question about AI interviews, placement preparation, or future API integrations? Send a message and the Intervoxa team will respond.
+        </p>
+      </section>
+
+      <section class="contact-layout" aria-label="Contact form and support details">
+        <aside class="info-card">
+          <p class="eyebrow">Support</p>
+          <h2>Build your interview confidence with guidance.</h2>
+          <p>
+            This form demonstrates professional client-side validation for Task 2 and prepares the platform for real contact management in later backend tasks.
+          </p>
+          <ul class="support-list">
+            <li><strong>Email:</strong> support@intervoxa.example</li>
+            <li><strong>Hours:</strong> Monday–Friday, 9 AM–6 PM</li>
+            <li><strong>Focus:</strong> AI, HR, coding, and resume practice</li>
+          </ul>
+        </aside>
+
+        <form class="contact-card" id="contactForm" novalidate>
+          <div class="form-header">
+            <h2>Send a Message</h2>
+            <p>All fields are required. Validation runs before submission.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="fullName">Full Name</label>
+              <input id="fullName" name="fullName" type="text" placeholder="Enter your full name" autocomplete="name" />
+              <small class="error-message" id="fullNameError"></small>
+            </div>
+
+            <div class="form-field">
+              <label for="email">Email Address</label>
+              <input id="email" name="email" type="email" placeholder="name@example.com" autocomplete="email" />
+              <small class="error-message" id="emailError"></small>
+            </div>
+
+            <div class="form-field">
+              <label for="phone">Phone Number</label>
+              <input id="phone" name="phone" type="tel" placeholder="10 digit phone number" inputmode="numeric" autocomplete="tel" />
+              <small class="error-message" id="phoneError"></small>
+            </div>
+
+            <div class="form-field">
+              <label for="subject">Subject</label>
+              <select id="subject" name="subject">
+                <option value="">Select a subject</option>
+                <option value="technical">Technical Interview Preparation</option>
+                <option value="hr">HR / Behavioral Interview</option>
+                <option value="resume">Resume-Based Questions</option>
+                <option value="support">Platform Support</option>
+              </select>
+              <small class="error-message" id="subjectError"></small>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="6" placeholder="Write your message here..."></textarea>
+            <small class="error-message" id="messageError"></small>
+          </div>
+
+          <button class="primary-button form-submit" type="submit">Submit Message</button>
+          <p class="success-message" id="successMessage" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2026 Intervoxa. Built as an AI Mock Interview internship project.</p>
+      <div>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Tracker</a>
+      </div>
+    </footer>
+
+    <script src="js/navigation.js" defer></script>
+    <script src="js/validation.js" defer></script>
+  </body>
+</html>
