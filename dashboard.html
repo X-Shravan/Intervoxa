@@ -79,6 +79,48 @@
         <ul class="task-list" id="taskList" aria-live="polite"></ul>
       </section>
 
+
+
+      <section class="analytics-panel" aria-label="Voice interview analytics">
+        <div class="task-manager-header">
+          <div>
+            <p class="eyebrow">AI Coach Dashboard</p>
+            <h2>Interview history and progress analytics</h2>
+          </div>
+          <a class="secondary-button" href="practice.html">Start Voice Interview</a>
+        </div>
+        <div class="dashboard-grid analytics-grid">
+          <article class="dashboard-card">
+            <span>Voice Interviews</span>
+            <strong id="interviewCount">0</strong>
+          </article>
+          <article class="dashboard-card completed-card">
+            <span>Average Score</span>
+            <strong id="averageScore">0%</strong>
+          </article>
+          <article class="dashboard-card pending-card">
+            <span>Skill Gap Analysis</span>
+            <ul class="skill-gap-list" id="skillGapList"></ul>
+          </article>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Domain</th>
+                <th>Language</th>
+                <th>Score</th>
+                <th>Focus Topic</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable">
+              <tr><td colspan="5">No interview history yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="quiz-shell" id="quizModule" aria-label="Interactive interview quiz">
         <div class="task-manager-header">
           <div>
@@ -174,5 +216,6 @@
     <script src="js/taskManager.js" defer></script>
     <script type="module" src="js/quiz.js"></script>
     <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/dashboardAnalytics.js"></script>
   </body>
 </html>
