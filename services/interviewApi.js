@@ -1,0 +1,234 @@
+// Interview data service layer kept independent from the UI so Task 4/5 can swap in Gemini-generated questions.
+const OPEN_TRIVIA_ENDPOINT = "https://opentdb.com/api.php";
+const MOCK_QUESTIONS_URL = "../assets/interviewQuestions.json";
+
+const categories = ["Java", "Python", "Web Development", "HR Interview", "Aptitude"];
+
+const questionBank = [
+  {
+    id: "java-easy-1",
+    category: "Java",
+    difficulty: "Easy",
+    question: "Which Java keyword is used to inherit a class?",
+    options: ["extends", "implements", "inherits", "super"],
+    correctAnswer: "extends",
+    explanation: "The extends keyword creates a subclass relationship in Java.",
+  },
+  {
+    id: "java-medium-1",
+    category: "Java",
+    difficulty: "Medium",
+    question: "What is the main benefit of using an interface in Java?",
+    options: ["Multiple behavior contracts", "Direct object storage", "Faster compilation only", "Automatic database access"],
+    correctAnswer: "Multiple behavior contracts",
+    explanation: "Interfaces define contracts that multiple classes can implement.",
+  },
+  {
+    id: "java-hard-1",
+    category: "Java",
+    difficulty: "Hard",
+    question: "Which collection is usually best for frequent insertions and removals from both ends?",
+    options: ["ArrayDeque", "HashMap", "TreeSet", "StringBuilder"],
+    correctAnswer: "ArrayDeque",
+    explanation: "ArrayDeque is optimized for double-ended queue operations.",
+  },
+  {
+    id: "python-easy-1",
+    category: "Python",
+    difficulty: "Easy",
+    question: "Which data type is immutable in Python?",
+    options: ["tuple", "list", "dict", "set"],
+    correctAnswer: "tuple",
+    explanation: "Tuples cannot be modified after creation.",
+  },
+  {
+    id: "python-medium-1",
+    category: "Python",
+    difficulty: "Medium",
+    question: "What does a Python decorator primarily do?",
+    options: ["Wraps or extends a function", "Deletes a module", "Starts a thread", "Compiles bytecode manually"],
+    correctAnswer: "Wraps or extends a function",
+    explanation: "Decorators receive a callable and return enhanced behavior.",
+  },
+  {
+    id: "python-hard-1",
+    category: "Python",
+    difficulty: "Hard",
+    question: "Which concept allows Python generators to produce values lazily?",
+    options: ["yield", "lambda", "global", "assert"],
+    correctAnswer: "yield",
+    explanation: "yield pauses generator execution and resumes on the next iteration.",
+  },
+  {
+    id: "web-easy-1",
+    category: "Web Development",
+    difficulty: "Easy",
+    question: "Which HTML tag links an external CSS file?",
+    options: ["link", "script", "style-src", "css"],
+    correctAnswer: "link",
+    explanation: "The link element with rel=stylesheet loads external CSS.",
+  },
+  {
+    id: "web-medium-1",
+    category: "Web Development",
+    difficulty: "Medium",
+    question: "What does CSS Flexbox handle best?",
+    options: ["One-dimensional layout", "Database indexing", "Server routing", "Image compression"],
+    correctAnswer: "One-dimensional layout",
+    explanation: "Flexbox arranges content along a row or column axis.",
+  },
+  {
+    id: "web-hard-1",
+    category: "Web Development",
+    difficulty: "Hard",
+    question: "Which API is commonly used to make browser HTTP requests?",
+    options: ["fetch", "querySelector", "localStorage", "requestAnimationFrame"],
+    correctAnswer: "fetch",
+    explanation: "fetch is the modern browser API for HTTP requests.",
+  },
+  {
+    id: "hr-easy-1",
+    category: "HR Interview",
+    difficulty: "Easy",
+    question: "What should your answer to 'Tell me about yourself' focus on?",
+    options: ["Relevant skills and goals", "Unrelated personal details", "Salary only", "One-word responses"],
+    correctAnswer: "Relevant skills and goals",
+    explanation: "Strong HR answers connect your background to the role.",
+  },
+  {
+    id: "hr-medium-1",
+    category: "HR Interview",
+    difficulty: "Medium",
+    question: "Which method helps structure behavioral interview answers?",
+    options: ["STAR", "FIFO", "CRUD", "REST"],
+    correctAnswer: "STAR",
+    explanation: "STAR means Situation, Task, Action, and Result.",
+  },
+  {
+    id: "hr-hard-1",
+    category: "HR Interview",
+    difficulty: "Hard",
+    question: "How should you explain a project failure in an interview?",
+    options: ["Share accountability and learning", "Blame teammates", "Hide the failure", "Avoid specifics"],
+    correctAnswer: "Share accountability and learning",
+    explanation: "Interviewers value reflection, ownership, and improvement.",
+  },
+  {
+    id: "aptitude-easy-1",
+    category: "Aptitude",
+    difficulty: "Easy",
+    question: "If 20% of 150 equals x, what is x?",
+    options: ["30", "20", "45", "15"],
+    correctAnswer: "30",
+    explanation: "20% of 150 is 0.2 × 150 = 30.",
+  },
+  {
+    id: "aptitude-medium-1",
+    category: "Aptitude",
+    difficulty: "Medium",
+    question: "A train travels 120 km in 2 hours. What is its average speed?",
+    options: ["60 km/h", "80 km/h", "40 km/h", "120 km/h"],
+    correctAnswer: "60 km/h",
+    explanation: "Speed equals distance divided by time: 120 ÷ 2 = 60.",
+  },
+  {
+    id: "aptitude-hard-1",
+    category: "Aptitude",
+    difficulty: "Hard",
+    question: "What is the next number in the sequence 2, 6, 12, 20, 30?",
+    options: ["42", "40", "44", "36"],
+    correctAnswer: "42",
+    explanation: "The differences are 4, 6, 8, 10, so the next difference is 12.",
+  },
+];
+
+function decodeHtml(value) {
+  const parser = new DOMParser();
+  return parser.parseFromString(value, "text/html").documentElement.textContent || value;
+}
+
+function shuffle(items) {
+  return [...items].sort(() => Math.random() - 0.5);
+}
+
+function normalizeDifficulty(difficulty) {
+  return difficulty ? `${difficulty.charAt(0).toUpperCase()}${difficulty.slice(1).toLowerCase()}` : "Easy";
+}
+
+function mapOpenTriviaQuestion(item, category) {
+  const correctAnswer = decodeHtml(item.correct_answer);
+  return {
+    id: crypto.randomUUID(),
+    category,
+    difficulty: normalizeDifficulty(item.difficulty),
+    question: decodeHtml(item.question),
+    options: shuffle([...item.incorrect_answers.map(decodeHtml), correctAnswer]),
+    correctAnswer,
+    explanation: "This question was fetched from Open Trivia DB and normalized by the Intervoxa service layer.",
+  };
+}
+
+
+async function loadQuestionBank() {
+  try {
+    const response = await fetch(MOCK_QUESTIONS_URL);
+
+    if (!response.ok) {
+      throw new Error("Mock question API could not be loaded.");
+    }
+
+    return response.json();
+  } catch {
+    return questionBank;
+  }
+}
+
+async function getLocalQuestions(category, difficulty) {
+  const questions = await loadQuestionBank();
+  return questions.filter((question) => {
+    const matchesCategory = !category || question.category === category;
+    const matchesDifficulty = !difficulty || question.difficulty === difficulty;
+    return matchesCategory && matchesDifficulty;
+  });
+}
+
+export async function fetchCategories() {
+  return [...categories];
+}
+
+export async function fetchQuestions({ category = "", difficulty = "", amount = 5, useRemote = false } = {}) {
+  const localMatches = await getLocalQuestions(category, difficulty);
+
+  if (!useRemote) {
+    return localMatches.slice(0, amount);
+  }
+
+  const difficultyParam = difficulty ? `&difficulty=${difficulty.toLowerCase()}` : "";
+  const response = await fetch(`${OPEN_TRIVIA_ENDPOINT}?amount=${amount}&type=multiple${difficultyParam}`);
+
+  if (!response.ok) {
+    throw new Error("Unable to fetch remote interview questions. Please try again.");
+  }
+
+  const data = await response.json();
+  const remoteQuestions = data.results.map((item) => mapOpenTriviaQuestion(item, category || "Aptitude"));
+  return remoteQuestions.length ? remoteQuestions : localMatches.slice(0, amount);
+}
+
+export async function getQuestionByCategory(category, difficulty = "", amount = 5) {
+  const exactMatches = await getLocalQuestions(category, difficulty);
+  const categoryMatches = await getLocalQuestions(category, "");
+  const combinedMatches = [...exactMatches];
+
+  categoryMatches.forEach((question) => {
+    if (combinedMatches.length < amount && !combinedMatches.some((item) => item.id === question.id)) {
+      combinedMatches.push(question);
+    }
+  });
+
+  if (!combinedMatches.length) {
+    return fetchQuestions({ category, difficulty, amount, useRemote: true });
+  }
+
+  return combinedMatches.slice(0, amount);
+}

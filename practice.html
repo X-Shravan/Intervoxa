@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Intervoxa interview practice page with domain selection, difficulty levels, generated questions, and answer drafting." />
+    <title>Interview Practice | Intervoxa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+
+    <header class="site-header" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Intervoxa home">
+        <span class="brand-mark">AI</span>
+        <span>Intervoxa</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNavigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-links" id="primaryNavigation" aria-label="Page navigation">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Preparation Tracker</a>
+        <a href="practice.html" aria-current="page">Practice</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <p class="eyebrow">Interview Practice</p>
+        <h1>Generate domain-based questions and draft your answer.</h1>
+        <p>
+          Select a domain and difficulty, generate interview questions, type a practice answer, and move through prompts one at a time. This page is structured for future Gemini AI evaluation.
+        </p>
+      </section>
+
+      <section class="practice-layout" aria-label="Interview practice generator">
+        <form class="practice-controls" id="practiceForm">
+          <p class="eyebrow">Controls</p>
+          <h2>Build a focused practice round</h2>
+          <div class="form-field">
+            <label for="practiceDomain">Select Domain</label>
+            <select id="practiceDomain"></select>
+          </div>
+          <div class="form-field">
+            <label for="practiceDifficulty">Select Difficulty</label>
+            <select id="practiceDifficulty">
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+          <button class="primary-button form-submit" type="submit">Generate Questions</button>
+          <button class="secondary-button form-submit" id="practiceRetryButton" type="button">Retry</button>
+          <p class="api-status" id="practiceStatus" role="status" aria-live="polite">Choose a domain to generate questions.</p>
+        </form>
+
+        <article class="practice-card is-hidden" id="practiceCard">
+          <div class="quiz-meta">
+            <span id="practiceCategory">Category</span>
+            <span id="practiceDifficultyLabel">Difficulty</span>
+          </div>
+          <div class="question-box">
+            <p class="box-label">Generated Question</p>
+            <h2 id="practiceQuestionText">Your generated question will appear here.</h2>
+          </div>
+          <div class="form-field answer-field">
+            <label for="practiceAnswer">Answer Question</label>
+            <textarea id="practiceAnswer" rows="8" placeholder="Type your structured interview answer here..."></textarea>
+          </div>
+          <button class="primary-button" id="practiceNextButton" type="button">Next Question</button>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2026 Intervoxa. Built as an AI Mock Interview internship project.</p>
+      <div>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Tracker</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </footer>
+
+    <script src="js/navigation.js" defer></script>
+    <script type="module" src="js/api.js"></script>
+  </body>
+</html>

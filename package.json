@@ -5,7 +5,7 @@
   "description": "Responsive AI mock interview platform UI with contact validation and preparation tracker.",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check js/navigation.js && node --check js/validation.js && node --check js/taskManager.js"
+    "check": "node --check server.js && node --check js/navigation.js && node --check js/validation.js && node --check js/taskManager.js && node --check js/quiz.js && node --check js/api.js && node --check services/interviewApi.js"
   },
   "keywords": [
     "ai-interview",
