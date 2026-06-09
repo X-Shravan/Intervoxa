@@ -28,6 +28,7 @@
       <nav class="nav-links" id="primaryNavigation" aria-label="Page navigation">
         <a href="index.html">Home</a>
         <a href="dashboard.html" aria-current="page">Preparation Tracker</a>
+        <a href="practice.html">Practice</a>
         <a href="contact.html">Contact</a>
       </nav>
     </header>
@@ -77,6 +78,130 @@
 
         <ul class="task-list" id="taskList" aria-live="polite"></ul>
       </section>
+
+
+
+      <section class="analytics-panel" aria-label="Voice interview analytics">
+        <div class="task-manager-header">
+          <div>
+            <p class="eyebrow">AI Coach Dashboard</p>
+            <h2>Interview history and progress analytics</h2>
+          </div>
+          <a class="secondary-button" href="practice.html">Start Voice Interview</a>
+        </div>
+        <div class="dashboard-grid analytics-grid">
+          <article class="dashboard-card">
+            <span>Voice Interviews</span>
+            <strong id="interviewCount">0</strong>
+          </article>
+          <article class="dashboard-card completed-card">
+            <span>Average Score</span>
+            <strong id="averageScore">0%</strong>
+          </article>
+          <article class="dashboard-card pending-card">
+            <span>Skill Gap Analysis</span>
+            <ul class="skill-gap-list" id="skillGapList"></ul>
+          </article>
+        </div>
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Domain</th>
+                <th>Language</th>
+                <th>Score</th>
+                <th>Focus Topic</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable">
+              <tr><td colspan="5">No interview history yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="quiz-shell" id="quizModule" aria-label="Interactive interview quiz">
+        <div class="task-manager-header">
+          <div>
+            <p class="eyebrow">Interactive Quiz</p>
+            <h2>Practice one interview question at a time</h2>
+          </div>
+          <span class="status-pill timer-pill">⏱ <span id="quizTimer">00:00</span></span>
+        </div>
+
+        <div class="quiz-setup" id="quizSetup">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="quizCategory">Select Category</label>
+              <select id="quizCategory"></select>
+            </div>
+            <div class="form-field">
+              <label for="quizDifficulty">Difficulty Level</label>
+              <select id="quizDifficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+          </div>
+          <button class="primary-button" id="startQuizButton" type="button">Start Quiz</button>
+        </div>
+
+        <div class="quiz-panel is-hidden" id="quizPanel">
+          <div class="quiz-meta">
+            <span id="questionCounter">Question 1 of 5</span>
+            <span id="questionCategory">Java</span>
+            <span id="questionDifficulty">Easy</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <span id="quizProgress"></span>
+          </div>
+          <article class="question-box quiz-question-card">
+            <p class="box-label">Question</p>
+            <h3 id="questionText">Question text will appear here.</h3>
+          </article>
+          <div class="answer-list" id="answerList" aria-label="Answer options"></div>
+          <div class="quiz-actions">
+            <button class="secondary-button" id="previousQuestionButton" type="button">Previous</button>
+            <button class="primary-button" id="nextQuestionButton" type="button">Next Question</button>
+          </div>
+        </div>
+
+        <div class="result-panel is-hidden" id="resultPanel">
+          <p class="eyebrow">Result Screen</p>
+          <h2>Your quiz performance</h2>
+          <div class="result-grid">
+            <article><span>Total Questions</span><strong id="totalQuestionsResult">0</strong></article>
+            <article><span>Correct Answers</span><strong id="correctAnswersResult">0</strong></article>
+            <article><span>Wrong Answers</span><strong id="wrongAnswersResult">0</strong></article>
+            <article><span>Percentage</span><strong id="percentageResult">0%</strong></article>
+          </div>
+          <p class="performance-level" id="performanceResult">Performance level appears here.</p>
+          <button class="primary-button" id="restartQuizButton" type="button">Try Another Quiz</button>
+        </div>
+
+        <p class="api-status" id="quizStatus" role="status" aria-live="polite">Choose a category and difficulty to begin.</p>
+      </section>
+
+      <section class="api-demo-grid" aria-label="API integration demos">
+        <article class="api-card">
+          <p class="eyebrow">Joke API Demo</p>
+          <h2>Warm up before the interview</h2>
+          <p id="jokeText">Click the button to fetch a random joke from an external API.</p>
+          <button class="secondary-button" id="jokeButton" type="button">Fetch Random Joke</button>
+          <small class="api-status" id="jokeStatus" aria-live="polite"></small>
+        </article>
+
+        <article class="api-card">
+          <p class="eyebrow">Question API Module</p>
+          <h2>Service-rendered sample questions</h2>
+          <ul class="api-question-list" id="apiQuestionList"></ul>
+          <button class="secondary-button" id="apiRetryButton" type="button">Retry Questions</button>
+          <small class="api-status" id="apiQuestionStatus" aria-live="polite"></small>
+        </article>
+      </section>
+
     </main>
 
     <footer class="site-footer">
@@ -89,5 +214,8 @@
 
     <script src="js/navigation.js" defer></script>
     <script src="js/taskManager.js" defer></script>
+    <script type="module" src="js/quiz.js"></script>
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/dashboardAnalytics.js"></script>
   </body>
 </html>

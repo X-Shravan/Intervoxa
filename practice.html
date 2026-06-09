@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Intervoxa interview practice page with domain selection, difficulty levels, generated questions, and answer drafting." />
+    <title>Interview Practice | Intervoxa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="background-orb orb-one"></div>
+    <div class="background-orb orb-two"></div>
+
+    <header class="site-header" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="Intervoxa home">
+        <span class="brand-mark">AI</span>
+        <span>Intervoxa</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primaryNavigation">
+        <span class="sr-only">Toggle navigation</span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav-links" id="primaryNavigation" aria-label="Page navigation">
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Preparation Tracker</a>
+        <a href="practice.html" aria-current="page">Practice</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <p class="eyebrow">Interview Practice</p>
+        <h1>Start an AI Live Interview with a human-like virtual interviewer.</h1>
+        <p>
+          Instead of a static question list, Intervoxa now runs a two-way interviewer-candidate conversation. The AI listens to each answer, remembers context, asks follow-up questions, challenges weak responses, and ends with a final report.
+        </p>
+      </section>
+
+      <section class="voice-coach-grid" id="voiceCoach" aria-label="Voice-based AI interview coach">
+        <form class="coach-controls" id="coachControls">
+          <p class="eyebrow">Conversational AI Interview</p>
+          <h2>Configure your virtual interviewer</h2>
+          <div class="form-field">
+            <label for="candidateName">Candidate Name</label>
+            <input id="candidateName" type="text" placeholder="Example: Shravan" autocomplete="name" />
+          </div>
+          <div class="form-field">
+            <label for="coachDomain">Domain Selection</label>
+            <select id="coachDomain"></select>
+          </div>
+          <div class="form-grid compact-grid">
+            <div class="form-field">
+              <label for="coachExperience">Experience</label>
+              <select id="coachExperience"></select>
+            </div>
+            <div class="form-field">
+              <label for="coachLanguage">Language Selection</label>
+              <select id="coachLanguage"></select>
+            </div>
+          </div>
+          <div class="form-grid compact-grid">
+            <div class="form-field">
+              <label for="coachDifficulty">Difficulty</label>
+              <select id="coachDifficulty"></select>
+            </div>
+            <div class="form-field">
+              <label for="coachQuestionType">Question Type</label>
+              <select id="coachQuestionType"></select>
+            </div>
+          </div>
+          <label class="stress-toggle" for="stressMode">
+            <input id="stressMode" type="checkbox" />
+            <span>Enable stress interview mode</span>
+          </label>
+          <div class="form-field">
+            <label for="geminiApiKey">Gemini API Key</label>
+            <input id="geminiApiKey" type="password" placeholder="Optional for live Gemini; mock AI works without a key" autocomplete="off" />
+            <small class="helper-text">Stored only in this browser's Local Storage for this demo. Move keys server-side in production.</small>
+          </div>
+          <button class="primary-button form-submit" id="generateInterviewButton" type="button">Start AI Live Interview</button>
+          <p class="api-status" id="coachStatus" role="status" aria-live="polite">Configure the virtual interviewer to begin.</p>
+        </form>
+
+        <article class="coach-stage">
+          <div class="quiz-meta">
+            <span id="coachQuestionMeta">No active question</span>
+          </div>
+          <div class="question-box voice-question">
+            <p class="box-label">Virtual Interviewer</p>
+            <h2 id="coachQuestionText">Start the interview to hear the opening question.</h2>
+          </div>
+          <div class="voice-actions">
+            <button class="secondary-button" id="speakQuestionButton" type="button">AI Speak</button>
+            <button class="secondary-button" id="micButton" type="button">Start Microphone</button>
+            <button class="primary-button" id="evaluateAnswerButton" type="button">Send Response</button>
+            <button class="secondary-button" id="nextCoachQuestionButton" type="button">End Interview</button>
+          </div>
+          <ol class="conversation-log" id="conversationLog" aria-label="Interview conversation memory"></ol>
+          <div class="form-field transcript-field">
+            <label for="coachTranscript">Live Transcript</label>
+            <textarea id="coachTranscript" rows="8" placeholder="Speak or type your response, then send it to the AI interviewer..."></textarea>
+          </div>
+        </article>
+      </section>
+
+      <section class="evaluation-grid" aria-label="AI evaluation and report generation">
+        <article class="evaluation-card score-card">
+          <p class="eyebrow">AI Evaluation</p>
+          <h2>Overall Score</h2>
+          <strong id="scoreValue">--</strong>
+          <button class="primary-button" id="downloadReportButton" type="button" disabled>Download PDF Report</button>
+        </article>
+        <article class="evaluation-card">
+          <h2>Strengths</h2>
+          <ul id="strengthsList"></ul>
+        </article>
+        <article class="evaluation-card">
+          <h2>Weaknesses</h2>
+          <ul id="weaknessesList"></ul>
+        </article>
+        <article class="evaluation-card ideal-answer-card">
+          <h2>Ideal Answer</h2>
+          <p id="idealAnswerText">Gemini or the mock evaluator will show an ideal answer after evaluation.</p>
+        </article>
+      </section>
+
+      <section class="prep-hub" aria-label="Study preparation and certifications">
+        <article class="prep-card">
+          <p class="eyebrow">Study Preparation Hub</p>
+          <h2>Learning roadmap</h2>
+          <ol id="roadmapList"></ol>
+        </article>
+        <article class="prep-card">
+          <h2>Interview preparation checklist</h2>
+          <ul id="checklistList"></ul>
+        </article>
+        <article class="prep-card">
+          <h2>Topic recommendations</h2>
+          <ul id="topicList"></ul>
+        </article>
+        <article class="prep-card certification-card">
+          <p class="eyebrow">Certification Recommendation Engine</p>
+          <h2>Suggested certifications and resources</h2>
+          <ul id="certificationList"></ul>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2026 Intervoxa. Built as an AI Mock Interview internship project.</p>
+      <div>
+        <a href="index.html">Home</a>
+        <a href="dashboard.html">Tracker</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </footer>
+
+    <script src="js/navigation.js" defer></script>
+    <script type="module" src="js/aiCoach.js"></script>
+  </body>
+</html>
