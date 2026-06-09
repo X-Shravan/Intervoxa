@@ -36,23 +36,33 @@
     <main>
       <section class="page-hero">
         <p class="eyebrow">Interview Practice</p>
-        <h1>Practice with a voice-based AI interview coach.</h1>
+        <h1>Start an AI Live Interview with a human-like virtual interviewer.</h1>
         <p>
-          Select a role, programming language, difficulty, and question type. Gemini can generate questions and evaluate answers, while Web Speech APIs support spoken questions, microphone capture, and live transcripts.
+          Instead of a static question list, Intervoxa now runs a two-way interviewer-candidate conversation. The AI listens to each answer, remembers context, asks follow-up questions, challenges weak responses, and ends with a final report.
         </p>
       </section>
 
       <section class="voice-coach-grid" id="voiceCoach" aria-label="Voice-based AI interview coach">
         <form class="coach-controls" id="coachControls">
-          <p class="eyebrow">Voice AI Coach</p>
-          <h2>Configure your Gemini-powered mock interview</h2>
+          <p class="eyebrow">Conversational AI Interview</p>
+          <h2>Configure your virtual interviewer</h2>
+          <div class="form-field">
+            <label for="candidateName">Candidate Name</label>
+            <input id="candidateName" type="text" placeholder="Example: Shravan" autocomplete="name" />
+          </div>
           <div class="form-field">
             <label for="coachDomain">Domain Selection</label>
             <select id="coachDomain"></select>
           </div>
-          <div class="form-field">
-            <label for="coachLanguage">Language Selection</label>
-            <select id="coachLanguage"></select>
+          <div class="form-grid compact-grid">
+            <div class="form-field">
+              <label for="coachExperience">Experience</label>
+              <select id="coachExperience"></select>
+            </div>
+            <div class="form-field">
+              <label for="coachLanguage">Language Selection</label>
+              <select id="coachLanguage"></select>
+            </div>
           </div>
           <div class="form-grid compact-grid">
             <div class="form-field">
@@ -64,13 +74,17 @@
               <select id="coachQuestionType"></select>
             </div>
           </div>
+          <label class="stress-toggle" for="stressMode">
+            <input id="stressMode" type="checkbox" />
+            <span>Enable stress interview mode</span>
+          </label>
           <div class="form-field">
             <label for="geminiApiKey">Gemini API Key</label>
             <input id="geminiApiKey" type="password" placeholder="Optional for live Gemini; mock AI works without a key" autocomplete="off" />
             <small class="helper-text">Stored only in this browser's Local Storage for this demo. Move keys server-side in production.</small>
           </div>
-          <button class="primary-button form-submit" id="generateInterviewButton" type="button">Generate AI Interview</button>
-          <p class="api-status" id="coachStatus" role="status" aria-live="polite">Configure your interview to begin.</p>
+          <button class="primary-button form-submit" id="generateInterviewButton" type="button">Start AI Live Interview</button>
+          <p class="api-status" id="coachStatus" role="status" aria-live="polite">Configure the virtual interviewer to begin.</p>
         </form>
 
         <article class="coach-stage">
@@ -78,18 +92,19 @@
             <span id="coachQuestionMeta">No active question</span>
           </div>
           <div class="question-box voice-question">
-            <p class="box-label">AI Interviewer Question</p>
-            <h2 id="coachQuestionText">Generate questions to begin your voice interview.</h2>
+            <p class="box-label">Virtual Interviewer</p>
+            <h2 id="coachQuestionText">Start the interview to hear the opening question.</h2>
           </div>
           <div class="voice-actions">
-            <button class="secondary-button" id="speakQuestionButton" type="button">Speak Question</button>
+            <button class="secondary-button" id="speakQuestionButton" type="button">AI Speak</button>
             <button class="secondary-button" id="micButton" type="button">Start Microphone</button>
-            <button class="primary-button" id="evaluateAnswerButton" type="button">Evaluate Answer</button>
-            <button class="secondary-button" id="nextCoachQuestionButton" type="button">Next Question</button>
+            <button class="primary-button" id="evaluateAnswerButton" type="button">Send Response</button>
+            <button class="secondary-button" id="nextCoachQuestionButton" type="button">End Interview</button>
           </div>
+          <ol class="conversation-log" id="conversationLog" aria-label="Interview conversation memory"></ol>
           <div class="form-field transcript-field">
             <label for="coachTranscript">Live Transcript</label>
-            <textarea id="coachTranscript" rows="8" placeholder="Use the microphone or type your answer here..."></textarea>
+            <textarea id="coachTranscript" rows="8" placeholder="Speak or type your response, then send it to the AI interviewer..."></textarea>
           </div>
         </article>
       </section>
@@ -97,7 +112,7 @@
       <section class="evaluation-grid" aria-label="AI evaluation and report generation">
         <article class="evaluation-card score-card">
           <p class="eyebrow">AI Evaluation</p>
-          <h2>Score</h2>
+          <h2>Overall Score</h2>
           <strong id="scoreValue">--</strong>
           <button class="primary-button" id="downloadReportButton" type="button" disabled>Download PDF Report</button>
         </article>

@@ -1414,3 +1414,85 @@ button:disabled,
     grid-column: auto;
   }
 }
+
+/* Conversational AI Live Interview refinements. */
+.stress-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.25rem 0 1.1rem;
+  border: 1px solid rgba(251, 191, 36, 0.32);
+  border-radius: 1rem;
+  background: rgba(251, 191, 36, 0.08);
+  padding: 0.9rem 1rem;
+  color: #fde68a;
+}
+
+.stress-toggle input {
+  width: auto;
+  accent-color: var(--amber);
+}
+
+.conversation-log {
+  display: grid;
+  max-height: 24rem;
+  overflow-y: auto;
+  gap: 0.9rem;
+  margin: 1.25rem 0;
+  padding: 0.25rem;
+  list-style: none;
+  scroll-behavior: smooth;
+}
+
+.conversation-turn,
+.conversation-empty {
+  border: 1px solid var(--border);
+  border-radius: 1.2rem;
+  background: rgba(15, 23, 42, 0.72);
+  padding: 1rem;
+  animation: fadeIn 220ms ease both;
+}
+
+.conversation-turn span {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: #a5f3fc;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.conversation-turn p,
+.conversation-empty {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.conversation-turn.is-ai {
+  margin-right: 8%;
+  border-color: rgba(34, 211, 238, 0.32);
+  background: rgba(34, 211, 238, 0.1);
+}
+
+.conversation-turn.is-user {
+  margin-left: 8%;
+  border-color: rgba(124, 58, 237, 0.35);
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.conversation-turn.is-user span {
+  color: #ddd6fe;
+}
+
+@media (min-width: 320px) and (max-width: 767px) {
+  .conversation-turn.is-ai,
+  .conversation-turn.is-user {
+    margin-inline: 0;
+  }
+
+  .conversation-log {
+    max-height: 18rem;
+  }
+}
