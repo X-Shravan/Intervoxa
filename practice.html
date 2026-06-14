@@ -74,20 +74,34 @@
               <select id="coachQuestionType"></select>
             </div>
           </div>
+          <div class="form-grid compact-grid">
+            <div class="form-field">
+              <label for="coachCompany">Company Mode</label>
+              <select id="coachCompany"></select>
+            </div>
+            <div class="form-field">
+              <label for="coachPersonality">Interviewer Personality</label>
+              <select id="coachPersonality"></select>
+            </div>
+          </div>
           <label class="stress-toggle" for="stressMode">
             <input id="stressMode" type="checkbox" />
             <span>Enable stress interview mode</span>
           </label>
           <div class="form-field">
-            <label for="geminiApiKey">Gemini API Key</label>
-            <input id="geminiApiKey" type="password" placeholder="Optional for live Gemini; mock AI works without a key" autocomplete="off" />
-            <small class="helper-text">Stored only in this browser's Local Storage for this demo. Move keys server-side in production.</small>
+            <label for="coachResume">Resume Upload</label>
+            <input id="coachResume" type="file" accept=".pdf,.txt,.doc,.docx" />
+            <small class="helper-text">Upload a resume to enable resume-based follow-up questions.</small>
           </div>
           <button class="primary-button form-submit" id="generateInterviewButton" type="button">Start AI Live Interview</button>
           <p class="api-status" id="coachStatus" role="status" aria-live="polite">Configure the virtual interviewer to begin.</p>
         </form>
 
         <article class="coach-stage">
+          <div class="quiz-meta">
+            <span id="questionProgress">Question 0 of 0</span>
+            <span id="sessionTimer">00:00</span>
+          </div>
           <div class="quiz-meta">
             <span id="coachQuestionMeta">No active question</span>
           </div>
@@ -98,7 +112,7 @@
           <div class="voice-actions">
             <button class="secondary-button" id="speakQuestionButton" type="button">AI Speak</button>
             <button class="secondary-button" id="micButton" type="button">Start Microphone</button>
-            <button class="primary-button" id="evaluateAnswerButton" type="button">Send Response</button>
+            <button class="primary-button" id="evaluateAnswerButton" type="button">Finish Answer</button>
             <button class="secondary-button" id="nextCoachQuestionButton" type="button">End Interview</button>
           </div>
           <ol class="conversation-log" id="conversationLog" aria-label="Interview conversation memory"></ol>

@@ -1,8 +1,5 @@
-// Gemini-ready service layer for Intervoxa's conversational AI interviewer.
-// The browser UI works with deterministic mock AI when no key is supplied, then switches to Gemini when a key is saved.
-const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+// Intervoxa interview service layer. The browser never stores or sends Gemini keys.
 const HISTORY_KEY = "intervoxaInterviewHistory";
-const API_KEY_STORAGE_KEY = "intervoxaGeminiApiKey";
 
 export const domainOptions = [
   "Software Engineer",
@@ -68,29 +65,18 @@ function safeParseJson(text) {
   }
 }
 
-async function callGemini(prompt, apiKey) {
-  if (!apiKey) {
-    throw new Error("Gemini API key is missing. Using Intervoxa mock AI instead.");
-  }
-
-  const response = await fetch(`${GEMINI_ENDPOINT}?key=${encodeURIComponent(apiKey)}`, {
+async function callBackend(path, payload) {
+  const response = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.72,
-        responseMimeType: "application/json",
-      },
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    throw new Error("Gemini request failed. Check the API key, quota, or network connection.");
+    throw new Error(`Backend request failed: ${response.status}`);
   }
 
-  const data = await response.json();
-  return data.candidates?.[0]?.content?.parts?.map((part) => part.text).join("\n") || "";
+  return response.json();
 }
 
 function skillsFor(domain) {
@@ -230,25 +216,15 @@ function normalizeFinalReport(parsed, fallback) {
 }
 
 export function getStoredApiKey() {
-  return localStorage.getItem(API_KEY_STORAGE_KEY) || "";
-}
-
-export function saveApiKey(apiKey) {
-  if (apiKey) {
-    localStorage.setItem(API_KEY_STORAGE_KEY, apiKey);
-    return;
-  }
-
-  localStorage.removeItem(API_KEY_STORAGE_KEY);
+  return "";
 }
 
 export async function getConversationalInterviewTurn(conversation, config) {
   const fallback = buildFallbackTurn(conversation, config);
-  const prompt = `${buildInterviewerSystemPrompt(config)}\n\nConversation so far:\n${transcriptFrom(conversation) || "No conversation yet."}\n\nGenerate the next interviewer message. Remember: ask exactly one question and return JSON only.`;
 
   try {
-    const text = await callGemini(prompt, config.apiKey);
-    return normalizeInterviewerTurn(safeParseJson(text), fallback);
+    const data = await callBackend("/api/interview/turn", { conversation, config });
+    return normalizeInterviewerTurn(data, fallback);
   } catch (error) {
     console.warn(error.message);
     return fallback;
@@ -257,11 +233,10 @@ export async function getConversationalInterviewTurn(conversation, config) {
 
 export async function generateFinalInterviewReport(conversation, config) {
   const fallback = fallbackFinalReport(conversation, config);
-  const prompt = `${buildInterviewerSystemPrompt(config)}\n\nThe interview is complete. Evaluate the full conversation and return JSON only using schema {"overallScore":8.2,"communication":8.5,"technicalSkills":8.0,"confidence":7.8,"problemSolving":8.4,"strengths":["..."],"weaknesses":["..."],"idealAnswer":"...","recommendedCertifications":["..."],"suggestedLearningPath":["..."]}.\n\nConversation:\n${transcriptFrom(conversation)}`;
 
   try {
-    const text = await callGemini(prompt, config.apiKey);
-    return normalizeFinalReport(safeParseJson(text), fallback);
+    const data = await callBackend("/api/interview/report", { conversation, config });
+    return normalizeFinalReport(data, fallback);
   } catch (error) {
     console.warn(error.message);
     return fallback;

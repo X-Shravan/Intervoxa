@@ -5,7 +5,11 @@
   "description": "Responsive AI mock interview platform UI with contact validation and preparation tracker.",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js && node --check js/navigation.js && node --check js/validation.js && node --check js/taskManager.js && node --check js/quiz.js && node --check js/api.js && node --check js/aiCoach.js && node --check js/dashboardAnalytics.js && node --check services/interviewApi.js && node --check services/geminiService.js"
+    "check": "node --check server.js && node --check js/navigation.js && node --check js/validation.js && node --check js/taskManager.js && node --check js/quiz.js && node --check js/api.js && node --check js/aiCoach.js && node --check js/dashboardAnalytics.js && node --check services/interviewApi.js && node --check services/geminiService.js && node --check services/interviewBackend.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
   },
   "keywords": [
     "ai-interview",

@@ -1,32 +1,43 @@
-const http = require("node:http");
-const { readFile } = require("node:fs/promises");
-const { extname, join, normalize } = require("node:path");
+require("dotenv").config();
+
+const express = require("express");
+const path = require("node:path");
+const { generateInterviewTurn, generateFinalInterviewReport } = require("./services/interviewBackend");
 
 const port = process.env.PORT || 3000;
 const publicRoot = process.cwd();
-const contentTypes = {
-  ".css": "text/css; charset=utf-8",
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-};
+const app = express();
 
-const server = http.createServer(async (request, response) => {
-  const url = new URL(request.url || "/", `http://${request.headers.host}`);
-  const safePath = normalize(url.pathname === "/" ? "/index.html" : url.pathname).replace(/^\.\.(\/|\\|$)/, "");
-  const filePath = join(publicRoot, safePath);
+app.disable("x-powered-by");
+app.use(express.json({ limit: "1mb" }));
+app.use(express.static(publicRoot, { extensions: ["html"] }));
 
+app.post("/api/interview/turn", async (request, response) => {
   try {
-    const file = await readFile(filePath);
-    response.writeHead(200, {
-      "Content-Type": contentTypes[extname(filePath)] || "application/octet-stream",
-    });
-    response.end(file);
-  } catch {
-    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    response.end("Not found");
+    const { conversation = [], config = {} } = request.body || {};
+    response.json(await generateInterviewTurn(conversation, config));
+  } catch (error) {
+    response.status(500).json({ error: error.message || "Unable to generate interview turn." });
   }
 });
 
-server.listen(port, () => {
+app.post("/api/interview/report", async (request, response) => {
+  try {
+    const { conversation = [], config = {} } = request.body || {};
+    response.json(await generateFinalInterviewReport(conversation, config));
+  } catch (error) {
+    response.status(500).json({ error: error.message || "Unable to generate interview report." });
+  }
+});
+
+app.get("/api/health", (_request, response) => {
+  response.json({ ok: true, apiKeyConfigured: Boolean(process.env.GEMINI_API_KEY) });
+});
+
+app.use((_request, response) => {
+  response.status(404).sendFile(path.join(publicRoot, "index.html"));
+});
+
+app.listen(port, () => {
   console.log(`Intervoxa landing page running at http://localhost:${port}`);
 });

@@ -6,11 +6,9 @@ import {
   generateFinalInterviewReport,
   getCertificationRecommendations,
   getConversationalInterviewTurn,
-  getStoredApiKey,
   getStudyPreparation,
   languageOptions,
   questionTypeOptions,
-  saveApiKey,
   saveInterviewResult,
 } from "../services/geminiService.js";
 
@@ -21,8 +19,10 @@ const experienceSelect = document.querySelector("#coachExperience");
 const languageSelect = document.querySelector("#coachLanguage");
 const difficultySelect = document.querySelector("#coachDifficulty");
 const typeSelect = document.querySelector("#coachQuestionType");
+const companySelect = document.querySelector("#coachCompany");
+const personalitySelect = document.querySelector("#coachPersonality");
 const stressModeToggle = document.querySelector("#stressMode");
-const apiKeyInput = document.querySelector("#geminiApiKey");
+const resumeInput = document.querySelector("#coachResume");
 const startButton = document.querySelector("#generateInterviewButton");
 const speakButton = document.querySelector("#speakQuestionButton");
 const micButton = document.querySelector("#micButton");
@@ -33,6 +33,8 @@ const transcriptInput = document.querySelector("#coachTranscript");
 const statusText = document.querySelector("#coachStatus");
 const questionText = document.querySelector("#coachQuestionText");
 const questionMeta = document.querySelector("#coachQuestionMeta");
+const questionProgress = document.querySelector("#questionProgress");
+const sessionTimer = document.querySelector("#sessionTimer");
 const conversationLog = document.querySelector("#conversationLog");
 const scoreValue = document.querySelector("#scoreValue");
 const strengthsList = document.querySelector("#strengthsList");
@@ -52,6 +54,12 @@ const state = {
   latestTurn: null,
   finalReport: null,
   isListening: false,
+  shouldRestartListening: false,
+  resumeText: "",
+  startedAt: null,
+  timerId: null,
+  committedSegments: [],
+  interimText: "",
 };
 
 function setStatus(message, isLoading = false) {
@@ -63,6 +71,30 @@ function setStatus(message, isLoading = false) {
 function fillSelect(select, options) {
   if (!select) return;
   select.innerHTML = options.map((option) => `<option value="${option}">${option}</option>`).join("");
+}
+
+function fillCompanySelect() {
+  if (!companySelect) return;
+  companySelect.innerHTML = [
+    "Any Company",
+    "Google",
+    "Amazon",
+    "Microsoft",
+    "Infosys",
+    "TCS",
+    "Wipro",
+    "Accenture",
+    "Capgemini",
+  ]
+    .map((company) => `<option value="${company}">${company}</option>`)
+    .join("");
+}
+
+function fillPersonalitySelect() {
+  if (!personalitySelect) return;
+  personalitySelect.innerHTML = ["Friendly", "Strict", "Google Style", "Amazon Style", "Startup Founder", "HR Recruiter", "Technical Lead"]
+    .map((personality) => `<option value="${personality}">${personality}</option>`)
+    .join("");
 }
 
 function renderList(list, items, fallback) {
@@ -86,9 +118,6 @@ function renderStudyHub(domain) {
 }
 
 function getConfig() {
-  const apiKey = apiKeyInput.value.trim();
-  saveApiKey(apiKey);
-
   return {
     candidateName: candidateNameInput.value.trim() || "Candidate",
     domain: domainSelect.value,
@@ -96,8 +125,10 @@ function getConfig() {
     language: languageSelect.value,
     difficulty: difficultySelect.value,
     questionType: typeSelect.value,
+    company: companySelect?.value || "Any Company",
+    personality: personalitySelect?.value || "Friendly",
     stressMode: stressModeToggle.checked,
-    apiKey,
+    resumeText: state.resumeText,
   };
 }
 
@@ -129,11 +160,15 @@ function renderConversation() {
 
 function renderActiveTurn() {
   const message = activeAssistantMessage();
+  const asked = state.conversation.filter((turn) => turn.role === "assistant").length;
 
   questionText.textContent = message || "Start an AI Live Interview to begin a natural interviewer-candidate conversation.";
   questionMeta.textContent = state.config
-    ? `${state.config.domain} • ${state.config.experience} • ${state.config.language} • ${state.config.questionType}${state.config.stressMode ? " • Stress Mode" : ""}`
+    ? `${state.config.domain} • ${state.config.experience} • ${state.config.language} • ${state.config.questionType} • ${state.config.personality}${state.config.company && state.config.company !== "Any Company" ? ` • ${state.config.company}` : ""}${state.config.stressMode ? " • Stress Mode" : ""}`
     : "No active interview";
+  if (questionProgress) {
+    questionProgress.textContent = `Question ${asked} of 15`;
+  }
   renderConversation();
 }
 
@@ -155,6 +190,92 @@ function setActionState(isBusy) {
   endButton.disabled = isBusy || !hasActiveInterview;
 }
 
+function formatTime(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+  const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
+function updateTimer() {
+  if (!sessionTimer || !state.startedAt) return;
+  const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
+  sessionTimer.textContent = formatTime(elapsed);
+}
+
+function resetTimer() {
+  state.startedAt = Date.now();
+  window.clearInterval(state.timerId);
+  updateTimer();
+  state.timerId = window.setInterval(updateTimer, 1000);
+}
+
+function setTranscriptValue() {
+  const committed = state.committedSegments.join(" ").trim();
+  const value = [committed, state.interimText].filter(Boolean).join(" ").trim();
+  transcriptInput.value = value;
+}
+
+function normalizeSegment(value) {
+  return value.replace(/\s+/g, " ").trim();
+}
+
+function startRecognitionInstance() {
+  if (!SpeechRecognition) return;
+
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "en-US";
+  state.isListening = true;
+  state.shouldRestartListening = true;
+  micButton.textContent = "Stop Microphone";
+  setStatus("Listening... speak naturally; the mic will stay active until you finish your answer.");
+
+  recognition.addEventListener("result", (event) => {
+    let interim = "";
+
+    for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      const result = event.results[index];
+      const transcript = normalizeSegment(result[0].transcript);
+
+      if (!transcript) continue;
+
+      if (result.isFinal) {
+        if (!state.committedSegments.at(-1) || state.committedSegments.at(-1) !== transcript) {
+          state.committedSegments.push(transcript);
+        }
+      } else {
+        interim = transcript;
+      }
+    }
+
+    state.interimText = interim;
+    setTranscriptValue();
+  });
+
+  recognition.addEventListener("end", () => {
+    if (state.shouldRestartListening) {
+      window.setTimeout(() => {
+        if (state.shouldRestartListening) {
+          startRecognitionInstance();
+        }
+      }, 220);
+      return;
+    }
+
+    state.isListening = false;
+    micButton.textContent = "Start Microphone";
+  });
+
+  try {
+    recognition.start();
+  } catch (error) {
+    state.isListening = false;
+    state.shouldRestartListening = false;
+    setStatus(error.message || "Could not start the microphone.");
+  }
+}
+
 async function requestInterviewerTurn(isOpening = false) {
   const turn = await getConversationalInterviewTurn(state.conversation, state.config);
   state.latestTurn = turn;
@@ -167,46 +288,75 @@ async function requestInterviewerTurn(isOpening = false) {
   }
 
   setStatus(isOpening ? "AI Live Interview started. The interviewer asked the first question." : "Follow-up question generated from your answer.");
+  await speakCurrentQuestion(true);
 }
 
 async function startInterview() {
+  stopListening();
+  window.speechSynthesis?.cancel();
   state.config = getConfig();
   state.conversation = [];
   state.latestTurn = null;
   state.finalReport = null;
+  state.committedSegments = [];
+  state.interimText = "";
+  state.shouldRestartListening = false;
+  state.isListening = false;
   transcriptInput.value = "";
   renderEvaluation(null);
   renderStudyHub(state.config.domain);
   setActionState(true);
   setStatus("Starting conversational AI interviewer...", true);
+  resetTimer();
 
   await requestInterviewerTurn(true);
   setActionState(false);
 
-  if (!state.config.apiKey) {
-    setStatus("Mock conversational interviewer is active. Add a Gemini key for live AI follow-up reasoning.");
-  }
+  setStatus("The interviewer is ready.");
 }
 
-function speakCurrentQuestion() {
+function speakCurrentQuestion(autoStartMic = false) {
   const message = activeAssistantMessage();
 
   if (!message || !window.speechSynthesis) {
     setStatus("Text-to-Speech is not supported in this browser.");
-    return;
+    if (autoStartMic) {
+      startListening();
+    }
+    return Promise.resolve();
   }
 
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(message);
-  utterance.rate = 0.92;
-  utterance.pitch = 1;
-  window.speechSynthesis.speak(utterance);
-  setStatus("AI interviewer is speaking the current question.");
+  return new Promise((resolve) => {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.rate = 0.92;
+    utterance.pitch = 1;
+    utterance.onend = () => {
+      if (autoStartMic) {
+        startListening();
+      }
+      resolve();
+    };
+    utterance.onerror = () => {
+      if (autoStartMic) {
+        startListening();
+      }
+      resolve();
+    };
+    window.speechSynthesis.speak(utterance);
+    setStatus("AI interviewer is speaking the current question.");
+  });
 }
 
 function stopListening() {
-  recognition?.stop();
+  state.shouldRestartListening = false;
+  try {
+    recognition?.stop();
+  } catch {
+    // ignore browser shutdown timing errors
+  }
   state.isListening = false;
+  state.interimText = "";
   micButton.textContent = "Start Microphone";
 }
 
@@ -221,27 +371,7 @@ function startListening() {
     return;
   }
 
-  recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = "en-US";
-  state.isListening = true;
-  micButton.textContent = "Stop Microphone";
-  setStatus("Listening... your speech is being converted into transcript text.");
-
-  recognition.addEventListener("result", (event) => {
-    const transcript = Array.from(event.results)
-      .map((result) => result[0].transcript)
-      .join(" ");
-    transcriptInput.value = transcript;
-  });
-
-  recognition.addEventListener("end", () => {
-    state.isListening = false;
-    micButton.textContent = "Start Microphone";
-  });
-
-  recognition.start();
+  startRecognitionInstance();
 }
 
 async function sendCandidateResponse() {
@@ -259,6 +389,8 @@ async function sendCandidateResponse() {
 
   state.conversation.push({ role: "user", content: answer });
   transcriptInput.value = "";
+  state.committedSegments = [];
+  state.interimText = "";
   renderConversation();
   setActionState(true);
   setStatus("AI interviewer is listening, analyzing, and preparing a follow-up...", true);
@@ -273,6 +405,7 @@ async function endInterview() {
   if (state.isListening) {
     stopListening();
   }
+  window.clearInterval(state.timerId);
 
   setActionState(true);
   setStatus("Generating final interview feedback report...", true);
@@ -337,7 +470,8 @@ function initializeCoach() {
   fillSelect(languageSelect, languageOptions);
   fillSelect(difficultySelect, difficultyOptions);
   fillSelect(typeSelect, questionTypeOptions);
-  apiKeyInput.value = getStoredApiKey();
+  fillCompanySelect();
+  fillPersonalitySelect();
   renderStudyHub(domainSelect.value);
   renderActiveTurn();
   renderEvaluation(null);
@@ -355,5 +489,19 @@ sendButton?.addEventListener("click", sendCandidateResponse);
 endButton?.addEventListener("click", endInterview);
 reportButton?.addEventListener("click", downloadReport);
 domainSelect?.addEventListener("change", () => renderStudyHub(domainSelect.value));
+resumeInput?.addEventListener("change", async () => {
+  const file = resumeInput.files?.[0];
+
+  if (!file) {
+    state.resumeText = "";
+    return;
+  }
+
+  if (file.type === "text/plain") {
+    state.resumeText = await file.text();
+  } else {
+    state.resumeText = `Resume file uploaded: ${file.name}. Candidate experience and projects should be inferred from the document.`;
+  }
+});
 
 initializeCoach();
